@@ -13,7 +13,7 @@ $pythonExe = Join-Path $PSScriptRoot "venv\Scripts\python.exe"
 
 # 1. Start Backend in separate console
 Write-Host "[1/3] Starting ORCA FastAPI Backend on http://localhost:8000..." -ForegroundColor Green
-$backendCmd = "`$env:PYTHONPATH = '$backendDir'; & '$pythonExe' -m uvicorn api.main:app --host 127.0.0.1 --port 8000"
+$backendCmd = "`$env:PYTHONPATH = '$backendDir'; & '$pythonExe' -m uvicorn api.main:app --host 0.0.0.0 --port 8000"
 Start-Process powershell -ArgumentList "-NoExit", "-Command", $backendCmd -WorkingDirectory $backendDir
 
 # 2. Start Frontend in separate console
