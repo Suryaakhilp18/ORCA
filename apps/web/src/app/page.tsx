@@ -59,20 +59,19 @@ export default function HomePage() {
   const runQuery = async (queryText: string, loc?: CoastalLocation) => {
     setIsLoading(true);
     try {
-      // 1. Submit query to backend
-      const resp = await submitMarineQuery(queryText, language);
-      
-      // 2. Allow 14s (2s * 7 agents) for the pipeline animation to complete
-      setTimeout(() => {
-        setQueryData(resp);
-        if (resp.candidates && resp.candidates.length > 0) {
-          setSelectedCandidate(resp.selected_pfz || resp.candidates[0]);
-        }
-        setIsLoading(false);
-      }, 14000);
+      // Execute backend fetch and exact 14s (2s * 7 agents) in parallel
+      const backendPromise = submitMarineQuery(queryText, language);
+      const timerPromise = new Promise((resolve) => setTimeout(resolve, 14000));
 
+      const [resp] = await Promise.all([backendPromise, timerPromise]);
+
+      setQueryData(resp);
+      if (resp.candidates && resp.candidates.length > 0) {
+        setSelectedCandidate(resp.selected_pfz || resp.candidates[0]);
+      }
     } catch (err) {
       console.error('Query failed:', err);
+    } finally {
       setIsLoading(false);
     }
   };
